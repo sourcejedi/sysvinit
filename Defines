@@ -1,0 +1,26 @@
+This file describes the defines you can toggle at the top of init.c.
+
+SYSLOG	- Use syslog for logging instead of directly writing to the
+	  console. I added this because Peter Macdonald asked it
+	  for his SLS release. It defaults to on, but for Linuxes
+	  < 0.99 you should turn it off.
+
+SHELL	- This is the shell that's used for executing the commands
+	  from inittab.
+
+SOME_USER The numeric id of the user to setuid() to before running
+	  the SU command.
+
+SU	- The command that is being run in single user mode. It might
+	  just as well be /bin/sh, but if you define SOME_USER to
+	  something else as 0, su will ask for a password before
+	  allowing you to go into single user mode. This is if you
+	  are paranoid - people could boot your machine when it's
+	  unattended into single user mode (with lilo, for example:
+	  Boot: linux single )
+
+The other defines describe themselves, I won't explain them because
+I doubt anyone would ever want to change them.
+
+Miquel van Smoorenburg, miquels@drinkel.nl.mugnet.org
+

@@ -1,0 +1,28 @@
+#! /bin/sh
+#
+# rc.local	This file is executed by init(8) when the system is being
+#		initialized.  It continues setting up the system after the
+#		base system has been brought up.
+#
+# Version:	@(#)/etc/rc.d/rc.local	2.00	02/17/93
+#
+# Author:	Miquel van Smoorenburg, <miquels@drinkel.nl.mugnet.org>
+#
+
+  # Kick the serial ports.
+  for i in 0 1 2 3
+  do
+	stty sane 19200 -clocal -crtscts </dev/cua$i >/dev/null 2>&1
+  done
+
+  # Initialize my internal modem on COM4 for auto answer.
+  echo "Initializing modem..."
+  ( echo -n '+++'
+    sleep 1
+    echo -n 'ATH0'
+    sleep 1
+    echo -n 'ATS0=8E0Q1&d2&c1'
+  ) > /dev/cua3
+
+  # All done.
+

@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# /etc/brc.. This script gets run just before the system is down.
+#
+PATH=/bin:/etc:/usr/bin
+echo Unmounting file systems.....
+umount -a
+echo Done.

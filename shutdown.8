@@ -1,0 +1,102 @@
+.\"{{{}}}
+.\"{{{  Title
+.TH SHUTDOWN 8 "May 13, 1993" "" "Linux Programmer's Manual"
+.\"}}}
+.\"{{{  Name
+.SH NAME
+shutdown \- bring the system down
+.\"}}}
+.\"{{{  Synopsis
+.SH SYNOPSIS
+.B /etc/shutdown
+.RB [ \-t
+.IR sec ]
+.RB [ \-rkhncf ]
+.I time
+.RI [ warning-message ]
+.\"}}}
+.\"{{{  Description
+.SH DESCRIPTION
+.B Shutdown
+brings the system down in a secure way.  All logged in users are
+notified that the system is going down, and \fIlogin(1)\fP is blocked.
+It is possible to shut the system down immideately, or after a delay.
+All processes are first notified that the system is going down by the
+signal \s-2SIGTERM\s0.  This gives programs like \fIvi(1)\fP the time to
+save the file being editted, mail and news processing programs a chance
+to exit cleanly, etc.  When the system is idle, the program
+\fB/etc/brc\fP is run, if present.  Then the system is either rebooted
+by \fIreboot(1)\fP or halted by \fIhalt(1)\fP.
+.\"}}}
+.\"{{{  Options
+.SH OPTIONS
+.\"{{{  -t sec
+.IP "\fB\-t\fP \fIsec\fP"
+Wait \fIsec\fP seconds between sending processes the warning and
+the kill signal.
+.\"}}}
+.\"{{{  -k
+.IP \fB\-k\fP
+Don't really shutdown; only send the warning messages to everybody.
+.\"}}}
+.\"{{{  -r
+.IP \fB\-r\fP
+Reboot after shutdown.
+.\"}}}
+.\"{{{  -h
+.IP \fB\-h\fP
+Halt after shutdown.
+.\"}}}
+.\"{{{  -n
+.IP \fB\-n\fP
+Don't sync before rebooting or halting.
+.\"}}}
+.\"{{{  -f
+.IP \fB\-f\fP
+Do a `fast' reboot, that means no filesystems will be checked.
+.\"}}}
+.\"{{{  -c
+.IP \fB\-c\fP
+Cancel an already running shutdown. With this option it is ofcourse
+not possible to give the \fBtime\fP argument, but you can enter a
+explanitory message on the command line that will be sent to all
+users.
+.\"}}}
+.\"{{{  time
+.IP \fItime\fP
+When to shutdown.
+.\"}}}
+.\"{{{  warning-message
+.IP \fIwarning-message\fP
+Message to send to all users.
+.\"}}}
+.PP
+The \fItime\fP argument can have different formats.  First, it can be an
+absolute time in the format \fIhh:mm\fP, in which \fIhh\fP is the hour
+(1 or 2 digits) and \fImm\fP is the minute of the hour (in two digits).
+Second, it can be in the format \fB+\fP\fIm\fP, in which \fIm\fP is the
+number of minutes to wait.  The word \fBnow\fP is an alias for \fB+0\fP.
+.PP
+The \fB\-f\fP flag means `reboot fast'.  This only creates an advisory
+file \fB/etc/fastboot\fP which can be tested by the system when it comes
+up again.  The boot rc file can test if this file is present, and decide
+not to run \fIfsck(1)\fP since the system has been shut down in the
+proper way.  After that, the boot process should remove
+\fB/etc/fastboot\fP.
+.\"}}}
+.\"{{{  Files
+.SH FILES
+.nf
+/etc/fastboot
+/etc/halt
+/etc/reboot
+.fi
+.\"}}}
+.\"{{{  Author
+.SH AUTHOR
+Miquel van Smoorenburg, miquels@drinkel.nl.mugnet.org
+.\"}}}
+.\"{{{  See also
+.SH "SEE ALSO"
+fsck(1), init(1), halt(8), reboot(8)
+.\"}}}

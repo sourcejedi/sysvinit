@@ -1,0 +1,160 @@
+.\"{{{}}}
+.\"{{{  Title
+.TH INIT 8 "May 1, 1993" "" "Linux Programmer's Manual"
+.\"}}}
+.\"{{{  Name
+.SH NAME
+init, telinit \- process control initialization
+.\"}}}
+.\"{{{  Synopsis
+.SH SYNOPSIS
+.B /etc/init
+.RB [ " \-t sec " ]
+.RB [ " 0123456SsQq " ]
+.br
+.B /etc/telinit
+.RB [ " \-t sec " ]
+.RB [ " 0123456sSQqabc " ]
+.\"}}}
+.\"{{{  Description
+.SH DESCRIPTION
+.\"{{{  init
+.SS Init
+.B Init
+is the father of all processes.  Its primary role is to create processes
+from a script stored in the file \fB/etc/inittab\fP (see
+\fIinittab\fP(5)).  This file usually has entries which cause \fBinit\fP
+to spawn \fBgetty\fPs on each line that users can log in.  It also
+controls autonomous processes required by any particular system.
+.PP
+A \fIrun level\fP is a software configuration of the system which allows
+only a selected group of processes to exist.  The processes spawned by
+\fBinit\fP for each of these \fIrun levels\fP are defined in the
+\fB/etc/inittab\fP file.  \fBInit\fP can be in one of eight \fIrun
+level\fPs, \fB0\(en6\fP and \fBS\fP or \fBs\fP.  The \fIrun level\fP is
+changed by having a privileged user run \fB/etc/telinit\fP, which sends
+appropriate signals to \fBinit\fP, telling it which run level to change
+to.
+.PP
+After \fBinit\fP is invoked as the last step of the kernel booting, it
+looks for the file \fB/etc/inittab\fP to see if there is an entry of the
+type \fBinitdefault\fP (see \fIinittab\fP(5)).  \fBinitdefault\fP
+determines the initial run level of the system.  If there is no such
+entry or no \fB/etc/inittab\fP at all, a \fIrun level\fP has to be
+entered at the system console.
+.PP
+\fIRun level\fP \fBS\fP or \fBs\fP bring the system to single user mode
+and do not require an \fB/etc/initttab\fP file.  In single user mode,
+\fB/bin/su\fP is invoked on \fB/dev/console\fP.
+.PP
+When entering single user mode, \fBinit\fP saves the console \fIioctl\fP(2)
+state to \fB/etc/ioctl.save\fP and resets the console to these states
+when exiting to multi user mode.  If this file does not exist then default
+settings are used.
+.PP
+When entering a multi user mode the first time, \fBinit\fP performs the
+\fBboot\fP and \fBbootwait\fP entries to allow file systems to be
+mounted before users can log in.  Then all entries matching the \fIrun
+level\fP are processed.
+.PP
+Each time a child terminates, \fBinit\fP records the fact and the reason
+it died in \fB/etc/utmp\fP and \fB/etc/wtmp\fP if these files exist.
+.PP
+After it has spawned all of the processes specified, \fBinit\fP waits
+for one of its descendant processes to die, a powerfail signal, or until
+it is signaled by \fB/etc/telinit\fP to change the system's \fIrun
+level\fP.  When one of the above three conditions occurs, it re-examines
+the \fB/etc/inittab\fP.  file.  New entries can be added to this file at
+any time.  However, \fBinit\fP still waits for one of the above three
+conditions to occur.  To provide for an instantaneous response, the
+\fBQ\fP or \fBq\fP command can wake up \fBinit\fP to re-examine the
+\fB/etc/inittab\fP file.
+.PP
+If \fBinit\fP is not in single user mode and receives a powerfail
+signal, special powerfail entries are invoked.
+.PP
+When \fBinit\fP is requested to change the \fIrun level\fP, it sends the
+warning signal \s-1\fBSIGTERM\fP\s0 to all processes that are undefined
+in the new \fIrun level\fP.  It then waits 20 seconds before forcibly
+terminating these processes via the kill signal \s-1\fBSIGKILL\fP\s0.
+Note that \fBinit\fP assumes that all these processes (and their
+descendants) remain in the same process group which \fBinit\fP
+originally created for them.  If any process changes its process group
+affiliation it will not receive these signals.  Such processes need to
+be terminated separately.
+.\"}}}
+.\"{{{  telinit
+.SS telinit
+\fB/etc/telinit\fP is linked to \fB/etc/init\fP.  It takes a
+one-character argument and signals \fBinit\fP to perform the appropriate
+action.  The following arguments serve as directives to
+\fB/etc/telinit\fP:
+.IP "\fB0\fP,\fB1\fP,\fB2\fP,\fB3\fP,\fB4\fP,\fB5\fP or \fB6\fP"
+tell \fB/etc/init\fP to switch to the specified run level.
+.IP \fBa\fP,\fBb\fP,\fBc\fP
+tell \fB/etc/init\fP to process only those \fB/etc/inittab\fP file
+entries having \fIrun level\fP \fBa\fP,\fBb\fP or \fBc\fP.
+.IP "\fBQ\fP or \fBq\fP"
+tells \fB/etc/init\fP to re-examine the \fB/etc/inittab\fP file.
+.IP "\fBS\fP or \fBs\fP"
+tells \fB/etc/init\fP to switch to single user mode.
+.PP
+\fB/etc/telinit\fP can also tell init how much time it should wait
+between sending processes the TERM and the KILL signal; default this
+is 20 seconds, but it can be changed by the \fB-t sec\fP option.
+.PP
+\fB/etc/telinit\fP can be invoked only by users with appropriate
+privileges.
+.\"}}}
+.\"}}}
+.\"{{{  Files
+.SH FILES
+.nf
+/etc/inittab
+/dev/console
+/etc/utmp
+/etc/wtmp
+.fi
+.\"}}}
+.\"{{{  Conforming to
+.SH CONFORMING TO
+\fBInit\fP is not really System V compatible.  It is more modeled after
+the \fBHP-UX init\fP.  This might change in the future if people feel
+that is really needed.
+.\"}}}
+.\"{{{  Warnings
+.SH WARNINGS
+\fBInit\fP assumes that processes and descendants of processes
+remain in the same process group which was originally created
+for them.  If the processes change their group, \fBinit\fP can't
+kill them and you may end up with two processes reading from one
+terminal line.
+.\"}}}
+.\"{{{  Diagnostics
+.SH DIAGNOSTICS
+If \fB/etc/init\fP finds that it is continuously respawning an entry
+more than 10 times in 2 minutes, it will assume that there is an error
+in the command string, generate an error message on the system console,
+and refuse to respawn this entry until either 5 minutes has elapsed or
+it receives a signal.  This prevents it from eating up system resources
+when someone makes a typographical error in the \fB/etc/inittab\fP file
+or the program for the entry is removed.
+.\"}}}
+.\"{{{  Restrictions
+.SH RESTRICTIONS
+If \fBinit\fP or \fBtelinit\fP is used to go into single user mode, the
+terminal from which this command was given should become the new logical
+system console.  This is not implemented.  Also, \fBInit\fP should save
+the modes of the system console every time single user mode is entered
+in the file \fB/etc/ioctl.save\fP, and restore them when single user
+mode is left.  This is also not implemented.
+.\"}}}
+.\"{{{  Author
+.SH AUTHOR
+Miquel van Smoorenburg (miquels@drinkel.nl.mugnet.org), initial manual
+page by Michael Haardt (u31b3hs@pool.informatik.rwth-aachen.de).
+.\"}}}
+.\"{{{  See also
+.SH "SEE ALSO"
+getty(1), login(1), sh(1), who(1), kill(2), inittab(5), utmp(5).
+.\"}}}

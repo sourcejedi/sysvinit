@@ -1,0 +1,78 @@
+
+	Propaganda for version 1.4 of SysVinit & utilities
+	==================================================
+
+After some time of debugging and improving my SysVinit for Linux, I
+decided that it's now time to get this thing out of the door. Most people
+using SysVinit will probably be SLS users. SLS uses (as far as I know)
+still version 1.2, so upgrading will be a very good idea.
+The last version of SysVinit was 1.3, but there was quite some confusion
+on where (and under what name) it could be found.
+
+Improvements made:
+
+- Init has real support for SIGPWR. That means you can connect the sense
+  line of an UPS to the serial port, run a daemon watching this line
+  and at the loss of power the system will shut down. A 'powerd' 
+  (power daemon watchdog program) is included, and some hints on how to
+  connect the UPS sense line to a serial port. It also supports a 'power
+  good' signal, so that the system can be brought back up if the power
+  restores in time (before the batteries of the UPS are exhausted).
+  NOTE: earlier SysVinits used the 'powerfail' and 'powerwait' type of
+  actions to catch the CTRL-ALT-DEL event. The name of that field has
+  consequently changed to 'ctrlaltdel'.
+
+- took the time to investigate all sorts of utmp and wtmp logging that
+  exist. There basically are two types, BSD and SysV and alas, they
+  don't quite mix. The new init tries to be compatible with both standards
+  (and it does a pretty good job at it). The included "last" utility
+  can read both BSD and SysV (and mixed) style wtmp files, even if they
+  are a bit messed up. (Even getty_ps2.07b is broken in this respect..)
+
+- Init now wait()'s for a child as soon as it sees that one has died.
+  This means no more zombies if you start xdm as a 'wait' process, or
+  during other asynchronous operations.
+
+- There is a 'real' single user mode, where you are all alone. All other
+  processes get killed, without kludgy scripts etc. to do this.
+
+- The default runlevel can be specified on the LILO command line.
+
+- the wall (write all user) function has been fixed in the 'wall' and
+  'shutdown' commands to time out on hung terminals (you know, the
+  "hanging telnet" problems. Should be solved when NET-2 is out of beta,
+  but just to be sure...)
+
+- Shutdown has been extended. You can now cancel already running shutdowns,
+  and it will notice when you are trying to start shutdown more than once.
+
+- Sample scripts are included to setup a SysV style /etc/rc.d script directory.
+
+- The shutdown and telinit (and init) utilities can take a '-t secs'
+  argument, specifying the time in seconds to wait between sending
+  processes the warning (TERM) and kill (KILL) signal, so to do a real
+  fast shutdown you can just use:
+  root # shutdown -t2 -rf now
+  or when switching runlevels you can do this very quick with
+  root # telinit -t2 2
+
+The SysVinit package includes
+
+* a SysV compatible /etc/init program
+* a telinit program (er, just a link to /etc/init) to change runlevels
+* a featureful shutdown
+* halt and last to assist shutdown
+* a very forgiving last utility
+* the wall & mesg programs
+* powerd, an UPS watchdog.
+* simple installation procedure
+* manpages for everything
+* sample scripts to set up an /etc/rc.d directory with scripts per runlevel.
+
+The new SysV init can be found on:
+
+tsx-11.mit.edu:/pub/Incoming as SysVinit-1.4.tar.z
+sunsite.unc.edu:/pub/Incoming as SysVinit-1.4.tar.z
+
+It will probably be moved to more appropriate directories in a few days.
+

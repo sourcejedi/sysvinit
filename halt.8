@@ -1,0 +1,58 @@
+.\"{{{}}}
+.\"{{{  Title
+.TH HALT,REBOOT 8 "May 13, 1993" "" "Linux Programmer's Manual"
+.\"}}}
+.\"{{{  Name
+.SH NAME
+halt, reboot \- stop the system.
+.\"}}}
+.\"{{{  Synopsis
+.SH SYNOPSIS
+.B /etc/halt
+.RB [ \-t
+.IR sec ]
+.RB [ \-nq ]
+.br
+.B /etc/reboot
+.RB [ \-t
+.IR sec ]
+.RB [ \-nq ]
+.\"}}}
+.\"{{{  Description
+.SH DESCRIPTION
+\fBHalt\fP and \fBreboot\fP send all processes the warning signal, then
+wait for 10 seconds, then send all processes the kill signal.  After
+that the system is either halted or rebooted.
+.\"}}}
+.\"{{{  Options
+.SH OPTIONS
+.IP \fB\-n\fP
+Don't sync before reboot or halt.
+.IP \fB\-q\fP
+Do a `quick' reboot or halt, don't send the warning signal.
+.IP "\fB\-t\fP \fIsec\fP"
+Wait \fIsec\fP seconds between sending processes the warning and the
+kill signal.
+.\"}}}
+.\"{{{  Diagnostics
+.SH DIAGNOSTICS
+If you're not the superuser, you will get the message `Can't idle init'.
+.\"}}}
+.\"{{{  Notes
+.SH NOTES
+\fIReboot\fP and \fIhalt\fP shouldn't be called directly, but only by a
+frontend like \fIshutdown\fP(1).  Even better, they should be builtin to
+\fIshutdown\fP.  However, historical practice prevents this.
+.PP
+\fIHalt\fP and \fIreboot\fP are just links to the same program, so the
+man page should be installed twice, as \fBhalt.8\fP and as
+\fBreboot.8\fP.
+.\"}}}
+.\"{{{  Author
+.SH AUTHOR
+Miquel van Smoorenburg, miquels@drinkel.nl.mugnet.org
+.\"}}}
+.\"{{{  See also
+.SH "SEE ALSO"
+shutdown(8), init(1)
+.\"}}}

@@ -1,0 +1,84 @@
+#! /bin/sh
+#
+# rc.inet	This shell script boots up the entire INET system.
+#		Note, that when this script is used to also fire
+#		up any important remote NFS disks (like the /usr
+#		distribution), care must be taken to actually
+#		have all the needed binaries online _now_ ...
+#
+# Version:	@(#)/etc/rc.d/rc.inet	2.10	02/24/93
+#
+# Author:	Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+#
+
+  # Constants.
+  NET="/usr/net/etc"
+  IN_SERV="lpd"
+# RPC_SERV="portmap nfsd mountd pcnfsd bwnfsd"
+  RPC_SERV="portmap nfsd mountd"
+  LPSPOOL="/var/spool/lpd"
+
+  # Say hello.
+  echo -n "INET:"
+
+  # At this point, we are ready to talk to The World...
+  /etc/mount -a -t nfs		# This may be our /usr runtime!!!
+
+  # Start the SYSLOG daemon.  This has to be the first server.
+  if [ -f ${NET}/syslogd ]
+  then
+	echo -n " syslogd"
+	${NET}/syslogd
+  fi
+
+  # Start the INET SuperServer
+  if [ -f ${NET}/inetd ]
+  then
+	echo -n " inetd"
+	${NET}/inetd
+  else
+	echo "no INETD found.  INET cancelled!"
+	exit 1
+  fi
+
+  # Start the NAMED/BIND name server.
+# if [ -f ${NET}/named ]
+# then
+#	echo -n " named"
+#	${NET}/named
+# fi
+
+  # Start the U-MAIL SMTP server.
+  if [ -f XXX/usr/lib/umail/umail ]
+  then
+	echo -n " umail"
+	/usr/lib/umail/umail -d7 -bd </dev/null >/dev/null 2>&1 &
+  fi
+
+  # Start the various INET servers.
+  for server in ${IN_SERV}
+  do
+	if [ -f ${NET}/${server} ]
+	then
+		echo -n " ${server}"
+		${NET}/${server}
+	fi
+  done
+
+  # Start the various SUN RPC servers.
+  for server in ${RPC_SERV}
+  do
+	if [ -f ${NET}/rpc.${server} ]
+	then
+		echo -n " ${server}"
+		if [ "${server}" = "bwnfsd" -o "${server}" = "pcnfsd" ]
+		then
+			${NET}/rpc.${server} ${LPSPOOL}
+		else
+			${NET}/rpc.${server}
+		fi
+	fi
+  done
+  echo
+
+  # Done!

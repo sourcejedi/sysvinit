@@ -1,0 +1,45 @@
+#
+# inittab	This file describes how the INIT process should set up
+#		the system in a certain run-level.
+#
+# Version:	@(#)inittab		2.04	17/05/93	MvS
+#
+# Author:	Miquel van Smoorenburg, <miquels@drinkel.nl.mugnet.org>
+#
+# Default runlevel.
+id:2:initdefault:
+
+# System initialization (runs when system boots).
+si:S:sysinit:/etc/rc.d/rc.S
+
+# Script to run when going single user.
+su:S:wait:/etc/rc.d/rc.K
+
+# Script to run when going multi user.
+rc:123456:wait:/etc/rc.d/rc.M
+
+# What to do at the "Three Finger Salute".
+ca::ctrlaltdel:/etc/shutdown -t3 -rf now
+
+# What to do when power fails (shutdown to single user).
+pf::powerfail:/etc/shutdown -f +5 "THE POWER IS FAILING"
+# If power is back before shutdown, cancel the running shutdown.
+pg:0123456:powerokwait:/etc/shutdown -c "THE POWER IS BACK"
+# If power comes back in single user mode, return to multi user mode.
+ps:S:powerokwait:/etc/init 2
+
+# The getties in multi user mode on consoles an serial lines.
+#
+# NOTE NOTE NOTE adjust this to your getty or you will not be
+#                able to login !!
+1:123456:respawn:/etc/getty CONSOLE tty1
+2:23456:respawn:/etc/getty CONS2 tty2
+3:2345:respawn:/etc/getty CONS3 tty3
+4:2345:respawn:/etc/getty CONS4 tty4
+t1:456:respawn:/etc/uugetty -h MODEM ttyS1
+t2:34:respawn:/etc/uugetty -h 19200 ttyS7
+
+# Runlevel 6 is for an X-window only system.
+x1:6:wait:/etc/rc.d/rc.6
+
+# End of /etc/inittab

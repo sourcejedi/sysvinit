@@ -1,0 +1,99 @@
+          *****************************************
+          *                                       *
+          *    SysV style init Version 2.4        *
+          *           14-05-1993                  *
+          *                                       *
+          *****************************************
+
+	Init, shutdown, reboot, halt, wall, last, mesg, powerd.
+
+All these programs are included in this package. They were initially
+developed for the Minix operating system, but since I am now using
+Linux, they are now primarily ment for Linux. The first Linux port of
+init.c was done by poe@daimi.aau.dk, and the manual page for init was
+written by Michael Haardt, who also helped me to debug init.
+
+All programs have been completely written from scratch. Therefore
+they are copyrighted by me. However, these versions are free to
+redistribute and to do with as you like. I will not take responsibility
+whatsoever on these programs.
+
+Installation should be straight forward: "make install" will
+compile everyhing and then put things into place. If you already have
+programs in non-standard places, the install script will see this
+and place the new programs there also. The install script will
+also convert an old-style inittab file to a new one.
+
+Alternatively, you can type "make" and install the programs by hand.
+Here is a list of preferred directories to put 'em:
+
+wall.1, last.1, mesg.1	   /usr/man/man1
+inittab.5		   /usr/man/man5
+init.8,halt.8, shutdown.8
+powerd.8		   /usr/man/man8
+
+init			   /etc/init
+inittab		   	   /etc/inittab
+telinit		   	   a link (with ln(1) ) to init, either
+			   in /bin or in /etc.
+halt			   /etc/halt
+reboot			   a link to /etc/halt in the same directory
+shutdown		   either /etc/shutdown or /bin/shutdown.
+			   (the install script soflinks them)
+brc			   /etc/brc
+wall			   /bin/wall
+mesg			   /usr/bin/mesg
+last			   /bin/last
+powerd			   /etc/powerd
+
+If you already _have_ a "wall" in /bin (the SLS release has, for example)
+do _not_ install this wall. Chances are that the wall you are already
+using is linked to /bin/write. Either first _remove_ /bin/wall before
+installing the new one, or don't install the new one at all.
+
+Telinit and shutdown can be either in /bin or /etc. Historically, they
+were placed in /etc but since the new policy seems to be that _all_
+executables belong in a bin directory, they might as well go into /bin.
+I think that init, halt reboot and brc belong in /etc because they are
+typically only executed once and not ment for direct execution by the user.
+Another suitable place for these programs might be in a directory like
+/sbin, though the source for shutdown should be changed then.
+
+Make _sure_ that the inittab you are installing is correct, or else your
+system will not be able to boot correctly the next times it's rebooted.
+Also make sure that there are no duplicate commands in /etc/inittab and
+/etc/rc.
+
+NOTE: if you are using the 'poeigl' getty, or getty_ps compiled
+for the poeigl simpleinit, you have to tell this to my init. This
+is because those getties do _not_ like the fact that init sets up
+utmp and wtmp entries for them. Just precede the /etc/getty ...
+command in /etc/inittab with a '+'. You then get someting like
+this:
+
+1:1234:respawn:+/etc/getty 9600 tty1
+
+BEWARE: the two arguments to getty (label, tty) are the other way around
+than you might expect with ps_getty. This is because _I_ use an other
+getty than most of you.
+
+Now reboot and pray..
+
+If it works, I would strongly recommend that you use in your inittab the
+line also present in the example inittab:
+
+ca::ctrlaltdel:/etc/shutdown -t3 -rf now
+(the install script does this by default)
+
+If you now press CTRL-ALT-DEL, the system will shut down and reboot cleanly!
+
+Per March 1993, I'm using a complete SysV style /etc/rc.d directory
+with scripts per runlevel. Please have a look at the samples (which is
+my current configuration) in the 'etc' subdirectory of this package,
+and configure your own system likewise.
+
+Miquel van Smoorenburg, miquels@drinkel.nl.mugnet.org
+
+PS. For people who feel up to it, there are some customizations possible
+by editing init.c and toggling a few simple defines there - read the
+file "Defines" for more information.

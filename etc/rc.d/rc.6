@@ -1,0 +1,18 @@
+#! /bin/sh
+#
+# rc.6		This file is executed by init(8) when the system is being
+#		initialized for run level 6 (which usually means X Windows
+#		on LINUX/Pro).
+#
+# Version:	@(#)/etc/rc.d/rc.6	2.00	02/17/93
+#
+# Author:	Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+#
+
+  # Tell the viewers what's going to happen...
+  echo "Starting up X Windows V.11 R.5..."
+
+  # Call the "xdm" program.
+  exec /usr/X11/bin/xdm -nodaemon
+
+  # All done.

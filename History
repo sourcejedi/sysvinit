@@ -1,0 +1,72 @@
+ Version:	1.0, 01-Feb-92
+		- Initial version, very primitive for the Minix
+		  operating system. Required some mods. to the
+		  kernel.
+
+ 		1.1, 30-Apr-92
+		- Read manual wrong: there is no 'action' field called
+		  process, but all entries are of type process. Every
+		  'process' get exec'ed by /bin/sh -c 'exec command'.
+		- Rapidly respawning processes are caught in the act.
+		- _SYSV support is really Linux support,
+		  done by poe@daimi.aau.dk on 25-Mar-92.
+
+		1.2, 16-Jun-92
+		- Bugreport from Michael Haardt ; removed deadlock
+		  and added 'waitpid' instead of 'wait' for SYSV.
+
+		1.3, 05-Jul-92
+		- Got a 386, so installed Linux. Added 'soft' reboot
+		  to be default under linux. Fixed some typos.
+
+		2.0 08-Dec-92
+		- Rewrote the code totally, so started with a new
+		  version number.
+		- Dropped Minix support, this code now is Linux - specific.
+		- With TEST switch on, this init & telinit can
+		  run standalone for test purposes.
+
+		2.1 28-Jan-93
+		- Fixed a bug with 'boot' and 'once'.
+		- Check 'initdefault' for validity.
+		- Reckognizes "single" as command line argument.
+		- Retries execvp with 'sh -c exec ..' if command
+		  is a shell script. (shouldn't execvp do this?)
+		- Added patches to use syslog if defined.
+
+		2.2 02-Mar-93
+		- Made wait()'s asynchronous
+		- Changed whole thing to one big state machine
+		- Now using 'pseudo levels' # & * for SYSINIT & BOOT
+		- Added a new type of 'action', called leave. This
+		  process will be executed when the system goes from a
+		  runlevel specified in it's runlevel field to a 
+		  level that's not. Nice to bring down NFS and the like.
+
+		2.3 24-Mar-93
+		- Ripped out the 'leave' action. To difficult, and
+		  unneeded.
+		- Going single user now kills _all_ processes.
+		- Added '-t secs' option to all commands.
+		- This version is stable enough to post.
+
+		2.4a 22-Apr-93
+		- Fixed last to reckognize BSD style wtmp logging.
+		- Changed init to write wtmp records that are
+		  SysV compliant but are also reckognized by the
+		  BSD last. Added a '+' option to the 'process'
+		  field of inittab, for getties that want to do
+		  their own utmp/wtmp housekeeping (kludge!).
+		- Now accepts a runlevel on the command line,
+		  and reckognizes the 'auto' argument. (Sets the
+		  environment variable AUTOBOOT to YES)
+
+		2.4g 15-May-93
+		- Changed init to really catch SIGPWR 'cause we
+		  hooked up an UPS to the Linux machine. The
+		  keyword for catching the TreeFingerSalute is
+		  now "ctrlaltdel" instead of "power{wait,fail}".
+
+		2.4  24-May-93
+		- Send out the official version into the world as
+		  SysVinit-2.4.tar.z.
